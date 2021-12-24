@@ -53,7 +53,6 @@ class FrozenLake(Environment):
             print("propabilities calculation implemented wrong !")'''
         self.rewards = np.zeros((self.n_states, self.n_states, self.n_actions), dtype=float)
         self.calculate_rewards()
-        print(self.rewards)
 
     def calculate_probs(self):
         for state in range(self.n_states):
@@ -72,8 +71,6 @@ class FrozenLake(Environment):
             if state != self.absorbing_state:
                 if self.lake_flat[state] == "$":
                     self.rewards[self.absorbing_state,state,:] = 1
-                elif self.lake_flat[state] == "#":
-                    self.rewards[self.absorbing_state,state,:] = -1
                     
 
     def _make_action(self,action,state):
