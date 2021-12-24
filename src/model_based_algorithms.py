@@ -52,8 +52,8 @@ def policy_iteration(env, gamma, theta, max_iterations, policy=None):
     
     # TODO:
     for i in range(max_iterations):
-        values = policy_evaluation(env, policy, gamma, theta,max_iterations)
-        policy = policy_improvement(env, values, gamma)
+        value = policy_evaluation(env, policy, gamma, theta,max_iterations)
+        policy = policy_improvement(env, value, gamma)
 
     return policy, value
     

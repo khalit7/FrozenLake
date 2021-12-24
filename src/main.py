@@ -1,4 +1,3 @@
-from numpy import ubyte
 from frozen_lake_enviroment import *
 from model_based_algorithms import *
 from tabular_model_free_algorithms import *
@@ -22,17 +21,17 @@ def main():
     
     print('')
     
-    # print('## Policy iteration')
-    # policy, value = policy_iteration(env, gamma, theta, max_iterations)
-    # env.render(policy, value)
+    print('## Policy iteration')
+    policy, value = policy_iteration(env, gamma, theta, max_iterations)
+    env.render(policy, value)
     
-    # print('')
+    print('')
     
-    # print('## Value iteration')
-    # policy, value = value_iteration(env, gamma, theta, max_iterations)
-    # env.render(policy, value)
+    print('## Value iteration')
+    policy, value = value_iteration(env, gamma, theta, max_iterations)
+    env.render(policy, value)
     
-    # print('')
+    print('')
     
     print('# Model-free algorithms')
     max_episodes = 2000

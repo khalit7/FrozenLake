@@ -42,13 +42,39 @@ class FrozenLake(Environment):
         # TODO:
         # call super constructor
         super(FrozenLake, self).__init__(n_states, n_actions, max_steps, pi, seed)
-        
-    def step(self, action):
-        state, reward, done = Environment.step(self, action)
-        
-        done = (state == self.absorbing_state) or done
-        
-        return state, reward, done
+
+        # calcualte models of the enviroment
+        self.probs = np.zeros((self.n_states, self.n_states, self.n_actions), dtype=float)
+        self.calculate_probs()
+        '''target = np.load("p.npy")
+        if target == self._p:
+            print("correctly calculated propabilities")
+        else:
+            print("propabilities calculation implemented wrong !")'''
+        self.rewards = np.zeros((self.n_states, self.n_states, self.n_actions), dtype=float)
+        self.calculate_rewards()
+        print(self.rewards)
+
+    def calculate_probs(self):
+        for state in range(self.n_states):
+            if state == self.absorbing_state or self.lake_flat[state] in ("#","$"):
+                self.probs[self.absorbing_state,state,:] = 1
+                continue
+            for action in range(self.n_actions):
+                for slip_action in range (self.n_actions):
+                    next_state = self._make_action(slip_action,state)
+                    self.probs[next_state,state,action] += self.slip/self.n_actions
+                    if action == slip_action:
+                        self.probs[next_state,state,action]+=1-self.slip
+
+    def calculate_rewards(self):
+        for state in range(self.n_states):
+            if state != self.absorbing_state:
+                if self.lake_flat[state] == "$":
+                    self.rewards[self.absorbing_state,state,:] = 1
+                elif self.lake_flat[state] == "#":
+                    self.rewards[self.absorbing_state,state,:] = -1
+                    
 
     def _make_action(self,action,state):
         '''
@@ -76,45 +102,25 @@ class FrozenLake(Environment):
         if action == 3: # actoin right
             new_state = state + 1
         return new_state
+        
+    def step(self, action):
+        state, reward, done = Environment.step(self, action)
+        
+        done = (state == self.absorbing_state) or done
+        
+        return state, reward, done
+
 
     def p(self, next_state, state, action):
-        if next_state ==0: # if this is the first time we are calling this function, get the slip action, else, use the previous slip action
-            self.slip_action = np.random.choice(range(self.n_actions))
 
-        if state == self.absorbing_state or self.lake_flat[state] in ('#','$'):
-            state = self.absorbing_state
-            if next_state == state:
-                return 1
-            else:
-                return 0
-        new_state_from_action = self._make_action(action,state)
-        new_state_from_slip = self._make_action(self.slip_action,state)
-
-
-            
-        if new_state_from_action == new_state_from_slip:
-            if new_state_from_action == next_state:
-                return 1
-            else:
-                return 0
-        else:
-            if new_state_from_action == next_state:
-                return 1-self.slip
-            if new_state_from_slip == next_state:
-                return self.slip
-            
-            return 0
+        return self.probs[next_state,state,action]
 
         
 
 
     def r(self, next_state, state, action):
-        # TODO:
-        if self.lake_flat[state] == "#" and next_state == self.absorbing_state:
-            return -1
-        if self.lake_flat[state] == "$" and next_state == self.absorbing_state:
-            return 1
-        return 0
+
+        return self.rewards[next_state,state,action]
    
     def render(self, policy=None, value=None):
         if policy is None:
