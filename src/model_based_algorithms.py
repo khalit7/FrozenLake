@@ -4,90 +4,64 @@ from frozen_lake_enviroment import *
 
 def policy_evaluation(env, policy, gamma, theta, max_iterations):
     value = np.zeros(env.n_states, dtype=np.float)
+    identity = np.identity(env.n_actions)
+    p = env.probs
+    r = env.rewards
 
-    # TODO:
+    curr_iteration = 0
     stop = False
-    iteration_counter = 0
-    while not stop:
-        for iteration in range(max_iterations) :
-            delta = 0
 
-            for s in range(env.n_states):
-                current_value = value[s]
-                # policy_action_prob = identity[policy[s]]
-                action_value = []
-                for next_s in range(env.n_states):
-                    action_value.append(env.p(next_s, s, policy[s]) * (env.r(next_s, s, policy[s]) + gamma * value[next_s]))
-                
-                value[s] = sum(action_value)
+    while curr_iteration < max_iterations and not stop:
+        delta = 0
 
-                delta = max(delta, abs(current_value - value[s]))
-            if delta < theta:
-                stop = True
-                break
+        for s in range(env.n_states):
+            current_value = value[s]
+            policy_action_prob = identity[policy[s]]
+            value[s] = np.sum(policy_action_prob * p[:,s,:] * (r[:,s,:] + (gamma * value.reshape(-1, 1))))
+            delta = max(delta, abs(current_value - value[s]))
+
+        curr_iteration += 1
+        stop = delta < theta
+
     return value
     
-def policy_improvement(env, value, gamma):
-    policy = np.zeros(env.n_states, dtype=int)
+# Small lake
+lake =   [['&', '.', '.', '.'],
+            ['.', '#', '.', '#'],
+            ['.', '.', '.', '#'],
+            ['#', '.', '.', '$']]
+
+env = FrozenLake(lake, slip=0.1, max_steps=16, seed=0)
+gamma = 0.9
+theta = 0.001
+max_iterations = 100
+policy = np.ones(env.n_states, dtype=int)
+policy_evaluation(env, policy, gamma, theta, max_iterations)
+
+
+# def policy_improvement(env, value, gamma):
+#     policy = np.zeros(env.n_states, dtype=int)
     
-    # TODO:
-    for s in range(env.n_states):
-        actions_list = []
-        for a in range(env.n_actions):
-            action_value = []
-            for next_s in range(env.n_states):
-                action_value.append(env.p(next_s, s, a) * (env.r(next_s, s, a) + gamma * value[next_s]))
+#     # TODO:
+
+#     return policy
+    
+# def policy_iteration(env, gamma, theta, max_iterations, policy=None):
+#     if policy is None:
+#         policy = np.zeros(env.n_states, dtype=int)
+#     else:
+#         policy = np.array(policy, dtype=int)
+    
+#     # TODO:
         
-            sum_action_value = sum(action_value)
-            actions_list.append(sum_action_value)
-        policy[s] = np.argmax(actions_list)
-
-    return policy
+#     return policy, value
     
-def policy_iteration(env, gamma, theta, max_iterations, policy=None):
-    if policy is None:
-        policy = np.zeros(env.n_states, dtype=int)
-    else:
-        policy = np.array(policy, dtype=int)
+# def value_iteration(env, gamma, theta, max_iterations, value=None):
+#     if value is None:
+#         value = np.zeros(env.n_states)
+#     else:
+#         value = np.array(value, dtype=np.float)
     
-    # TODO:
-    for i in range(max_iterations):
-        value = policy_evaluation(env, policy, gamma, theta,max_iterations)
-        policy = policy_improvement(env, value, gamma)
+#     # TODO:
 
-    return policy, value
-    
-def value_iteration(env, gamma, theta, max_iterations, value=None):
-    if value is None:
-        value = np.zeros(env.n_states)
-    else:
-        value = np.array(value, dtype=np.float)
-    
-    # TODO:
-    stop = False
-    iteration_counter = 0
-    while not stop:
-        for iteration in range(max_iterations) :
-            delta = 0
-
-            for s in range(env.n_states):
-                current_value = value[s]
-
-                actions_list = []
-                for a in range(env.n_actions):
-                    action_value = []
-                    for next_s in range(env.n_states):
-                        action_value.append(env.p(next_s, s, a) * (env.r(next_s, s, a) + gamma * value[next_s]))
-                
-                    sum_action_value = sum(action_value)
-                    actions_list.append(sum_action_value)
-
-                value[s] = max(actions_list)
-                delta = max(delta, abs(current_value - value[s]))
-            if delta < theta:
-                stop = True
-                break
-
-        policy = policy_improvement(env, value, gamma)
-
-    return policy, value
+#     return policy, value
