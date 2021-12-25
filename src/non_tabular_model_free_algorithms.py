@@ -43,7 +43,7 @@ class LinearWrapper:
         self.env.render(policy, value)
         
 def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
-    random_state = np.random.RandomState(seed)
+    rand_state = np.random.RandomState(seed)
     
     eta = np.linspace(eta, 0, max_episodes)
     epsilon = np.linspace(epsilon, 0, max_episodes)
@@ -56,11 +56,44 @@ def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
         q = features.dot(theta)
 
         # TODO:
-    
+        #-- LineareGreedySelection
+        actions = range(env.n_actions)
+
+        if rand_state.rand() < epsilon[i]:
+            a = rand_state.choice(actions)
+        else:
+            #-- argmax_random
+            arg = np.argsort(q[actions])[::-1]
+            n_tied = sum(np.isclose(q[actions], q[actions][arg[0]]))
+            a = np.random.choice(arg[0:n_tied])
+            a =  actions[a]
+
+
+        done = False
+        while not done:
+            next_features, r, done = env.step(a)
+            delta = r - q[a]
+            q = next_features.dot(theta)
+            actions = range(env.n_actions)
+
+            if rand_state.rand() < epsilon[i]:
+                next_a = rand_state.choice(actions)
+            else:
+                #-- argmax_random
+                arg = np.argsort(q[actions])[::-1]
+                n_tied = sum(np.isclose(q[actions], q[actions][arg[0]]))
+                next_a = np.random.choice(arg[0:n_tied])
+                next_a =  actions[a]
+            
+            delta += gamma * q[next_a]
+            theta += eta[i] * delta * features[a,:]
+            features = next_features
+            a = next_a
+
     return theta
     
 def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
-    random_state = np.random.RandomState(seed)
+    rand_state = np.random.RandomState(seed)
     
     eta = np.linspace(eta, 0, max_episodes)
     epsilon = np.linspace(epsilon, 0, max_episodes)
@@ -71,5 +104,28 @@ def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
         features = env.reset()
         
         # TODO:
+        q = features.dot(theta)
+
+        done = False
+        while not done:
+            #-- LineareGreedySelection
+            actions = range(env.n_actions)
+
+            if rand_state.rand() < epsilon[i]:
+                a = rand_state.choice(actions)
+            else:
+                #-- argmax_random
+                arg = np.argsort(q[actions])[::-1]
+                n_tied = sum(np.isclose(q[actions], q[actions][arg[0]]))
+                a = np.random.choice(arg[0:n_tied])
+                a =  actions[a]
+                
+            
+            next_features, r, done = env.step(a)
+            delta = r - q[a]
+            q = next_features.dot(theta)
+            delta += gamma * max(q)
+            theta += eta[i] * delta * features[a, :]
+            features = next_features
 
     return theta    

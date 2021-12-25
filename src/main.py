@@ -52,22 +52,22 @@ def main():
     
     print('')
     
-    # linear_env = LinearWrapper(env)
+    linear_env = LinearWrapper(env)
     
-    # print('## Linear Sarsa')
+    print('## Linear Sarsa')
     
-    # parameters = linear_sarsa(linear_env, max_episodes, eta,
-    #                           gamma, epsilon, seed=seed)
-    # policy, value = linear_env.decode_policy(parameters)
-    # linear_env.render(policy, value)
+    parameters = linear_sarsa(linear_env, max_episodes, eta,
+                              gamma, epsilon, seed=seed)
+    policy, value = linear_env.decode_policy(parameters)
+    linear_env.render(policy, value)
     
-    # print('')
+    print('')
     
-    # print('## Linear Q-learning')
+    print('## Linear Q-learning')
     
-    # parameters = linear_q_learning(linear_env, max_episodes, eta,
-    #                                gamma, epsilon, seed=seed)
-    # policy, value = linear_env.decode_policy(parameters)
-    # linear_env.render(policy, value)
+    parameters = linear_q_learning(linear_env, max_episodes, eta,
+                                   gamma, epsilon, seed=seed)
+    policy, value = linear_env.decode_policy(parameters)
+    linear_env.render(policy, value)
 
 main()
