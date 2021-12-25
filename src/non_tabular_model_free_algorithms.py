@@ -43,7 +43,7 @@ class LinearWrapper:
         self.env.render(policy, value)
         
 def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
-    rand_state = np.random.RandomState(seed)
+    random_state = np.random.RandomState(seed)
     
     eta = np.linspace(eta, 0, max_episodes)
     epsilon = np.linspace(epsilon, 0, max_episodes)
@@ -56,44 +56,44 @@ def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
         q = features.dot(theta)
 
         # TODO:
-        #-- LineareGreedySelection
+        #-- Finding the lineare greedy selection
         actions = range(env.n_actions)
 
-        if rand_state.rand() < epsilon[i]:
-            a = rand_state.choice(actions)
+        if random_state.rand() < epsilon[i]:
+            action = random_state.choice(actions)
         else:
-            #-- argmax_random
+            #-- finding the maximum argument randomly 
             arg = np.argsort(q[actions])[::-1]
             n_tied = sum(np.isclose(q[actions], q[actions][arg[0]]))
-            a = np.random.choice(arg[0:n_tied])
-            a =  actions[a]
+            action = np.random.choice(arg[0:n_tied])
+            action =  actions[action]
 
 
         done = False
         while not done:
-            next_features, r, done = env.step(a)
-            delta = r - q[a]
+            next_features, r, done = env.step(action)
+            delta = r - q[action]
             q = next_features.dot(theta)
             actions = range(env.n_actions)
 
-            if rand_state.rand() < epsilon[i]:
-                next_a = rand_state.choice(actions)
+            if random_state.rand() < epsilon[i]:
+                next_action = random_state.choice(actions)
             else:
-                #-- argmax_random
+                #-- finding the maximum argument randomly 
                 arg = np.argsort(q[actions])[::-1]
                 n_tied = sum(np.isclose(q[actions], q[actions][arg[0]]))
-                next_a = np.random.choice(arg[0:n_tied])
-                next_a =  actions[a]
+                next_action = np.random.choice(arg[0:n_tied])
+                next_action =  actions[action]
             
-            delta += gamma * q[next_a]
-            theta += eta[i] * delta * features[a,:]
+            delta += gamma * q[next_action]
+            theta += eta[i] * delta * features[action,:]
             features = next_features
-            a = next_a
+            action = next_action
 
     return theta
     
 def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
-    rand_state = np.random.RandomState(seed)
+    random_state = np.random.RandomState(seed)
     
     eta = np.linspace(eta, 0, max_episodes)
     epsilon = np.linspace(epsilon, 0, max_episodes)
@@ -108,24 +108,24 @@ def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
 
         done = False
         while not done:
-            #-- LineareGreedySelection
+            #-- Finding the lineare greedy selection
             actions = range(env.n_actions)
 
-            if rand_state.rand() < epsilon[i]:
-                a = rand_state.choice(actions)
+            if random_state.rand() < epsilon[i]:
+                action = random_state.choice(actions)
             else:
-                #-- argmax_random
+                #-- finding the maximum argument randomly 
                 arg = np.argsort(q[actions])[::-1]
                 n_tied = sum(np.isclose(q[actions], q[actions][arg[0]]))
-                a = np.random.choice(arg[0:n_tied])
-                a =  actions[a]
+                action = np.random.choice(arg[0:n_tied])
+                action =  actions[action]
                 
             
-            next_features, r, done = env.step(a)
-            delta = r - q[a]
+            next_features, r, done = env.step(action)
+            delta = r - q[action]
             q = next_features.dot(theta)
             delta += gamma * max(q)
-            theta += eta[i] * delta * features[a, :]
+            theta += eta[i] * delta * features[action, :]
             features = next_features
 
     return theta    
