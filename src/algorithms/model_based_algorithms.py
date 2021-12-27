@@ -40,7 +40,7 @@ def policy_improvement(env, value, gamma):
 
     return policy
     
-def policy_iteration(env, gamma, theta, max_iterations, policy=None):
+def policy_iteration(env, gamma, theta, max_iterations, policy=None,experiments=False):
     if policy is None:
         policy = np.zeros(env.n_states, dtype=int)
     else:
@@ -65,11 +65,12 @@ def policy_iteration(env, gamma, theta, max_iterations, policy=None):
     end = timeit.default_timer()
 
     value = policy_evaluation(env, policy, gamma, theta, max_iterations)
-    print("**********************policy iteration took {} iterations to find the optimal policy. The algorithm ran in {} ms********************************".format(current_iteration,end-start))
+    if experiments:
+        print("**********************policy iteration took {} iterations to find the optimal policy. The algorithm ran in {} ms********************************".format(current_iteration,end-start))
     return policy, value
 
 
-def value_iteration(env, gamma, theta, max_iterations, value=None):
+def value_iteration(env, gamma, theta, max_iterations, value=None,experiments=False):
     if value is None:
         value = np.zeros(env.n_states)
     else:
@@ -94,5 +95,6 @@ def value_iteration(env, gamma, theta, max_iterations, value=None):
         stop = delta < theta
     end = timeit.default_timer()
     policy = policy_improvement(env, value, gamma)
-    print("**********************value iteration took {} iterations to find the optimal policy. The algorithms ran in {} ms********************************".format(curr_iteration,end-start))
+    if experiments:
+        print("**********************value iteration took {} iterations to find the optimal policy. The algorithms ran in {} ms********************************".format(curr_iteration,end-start))
     return policy, value
