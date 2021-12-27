@@ -17,7 +17,7 @@ def experiment_sarsa(env, max_episodes, eta, gamma, epsilon, optimal_value,theta
     epsilon = np.linspace(epsilon, 0, max_episodes)
     
     q = np.zeros((env.n_states, env.n_actions))
-    
+    convereged = False
     for i in range(max_episodes):
         # start by reseting the environment and reset the while loop condition to False
         s = env.reset()
@@ -40,8 +40,10 @@ def experiment_sarsa(env, max_episodes, eta, gamma, epsilon, optimal_value,theta
         policy = q.argmax(axis=1)
         value = q.max(axis=1)
         if np.all(np.abs(optimal_value - value)< theta):
+            convereged = True
             break
-    print("****************************** Sarsa converaged on episode {} **********************".format(i))
+    if convereged:
+        print("****************************** Sarsa converaged on episode {} **********************".format(i+1))
     return policy, value
     
 def experiment_q_learning(env, max_episodes, eta, gamma, epsilon, optimal_value,theta,seed=None):
@@ -52,7 +54,8 @@ def experiment_q_learning(env, max_episodes, eta, gamma, epsilon, optimal_value,
     epsilon = np.linspace(epsilon, 0, max_episodes)
     
     q = np.zeros((env.n_states, env.n_actions))
-    
+    convereged = False
+
     for i in range(max_episodes):
         # start by reseting the environment and reset the while loop condition to False
         s = env.reset()
@@ -74,8 +77,10 @@ def experiment_q_learning(env, max_episodes, eta, gamma, epsilon, optimal_value,
         policy = q.argmax(axis=1)
         value = q.max(axis=1)
         if np.all(np.abs(optimal_value - value)< theta):
+            convereged = True
             break
-    print("******************************Q-Learning converaged on episode {} **********************".format(i))
+    if convereged:
+        print("******************************Q-Learning converaged on episode {} **********************".format(i+1))
     return policy, value
 
 
@@ -99,42 +104,42 @@ big_lake = [['&', '.', '.', '.', '.', '.', '.', '.'],
         ['.', '.', '.', '#', '.', '.', '.', '$']]
 
 env_small = FrozenLake(small_lake, slip=0.1, max_steps=16, seed=seed)
-env_big = FrozenLake(big_lake, slip=0.1, max_steps=16, seed=seed)
+env_big = FrozenLake(big_lake, slip=0.1, max_steps=64, seed=seed)
 ############################################################### Question 2 ############################################################### 
-# print('Question 2 : How many iterations did policy iteration require to find an optimal policy for the big frozen lake? How many iterations did value iteration require? Which algorithm was faster?')
-# gamma = 0.9
-# theta = 0.001
-# max_iterations = 100
+print('Question 2 : How many iterations did policy iteration require to find an optimal policy for the big frozen lake? How many iterations did value iteration require? Which algorithm was faster?')
+gamma = 0.9
+theta = 0.001
+max_iterations = 100
 
-# print('')
+print('')
 
-# policy, optimal_value = policy_iteration(env_big, gamma, theta, max_iterations,experiments=True)
+policy, optimal_value = policy_iteration(env_big, gamma, theta, max_iterations,experiments=True)
 
-# print('')
+print('')
 
-# policy, optimal_value = value_iteration(env_big, gamma, theta, max_iterations,experiments=True)
+policy, optimal_value = value_iteration(env_big, gamma, theta, max_iterations,experiments=True)
 
-# print('')
-# ############################################################### Question 3 ############################################################### 
-# print('Question3: How many episodes did Sarsa control require to find an optimal policy for the small frozen lake? How many episodes did Q-learning control require?')
-# max_episodes = 15000
-# eta = 0.5
-# epsilon = 0.5
-# _, optimal_value = value_iteration(env_small, gamma, theta, max_iterations)
-# theta = 0.1
-# print('')
+print('')
+############################################################### Question 3 ############################################################### 
+print('Question3: How many episodes did Sarsa control require to find an optimal policy for the small frozen lake? How many episodes did Q-learning control require?')
+max_episodes = 15000
+eta = 0.5
+epsilon = 0.5
+_, optimal_value = value_iteration(env_small, gamma, theta, max_iterations)
+theta = 0.1
+print('')
 
-# print('## Sarsa')
-# policy, value = experiment_sarsa(env_small, max_episodes, eta, gamma, epsilon, optimal_value,theta,seed=seed)
-# env_small.render(policy, value)
+print('## Sarsa')
+policy, value = experiment_sarsa(env_small, max_episodes, eta, gamma, epsilon, optimal_value,theta,seed=seed)
+env_small.render(policy, value)
 
-# print('')
+print('')
 
-# print('## Q-learning')
-# policy, value = experiment_q_learning(env_small, max_episodes, eta, gamma, epsilon,optimal_value ,theta,seed=seed)
-# env_small.render(policy, value)
+print('## Q-learning')
+policy, value = experiment_q_learning(env_small, max_episodes, eta, gamma, epsilon,optimal_value ,theta,seed=seed)
+env_small.render(policy, value)
 
-# print('')
+print('')
 
 
 ############################################################### Question 5 ############################################################### 
@@ -142,9 +147,9 @@ print('Question 5 : Try to find an optimal policy for the big frozen lake by twe
 gamma = 0.9
 theta = 0.001
 max_iterations = 100
-max_episodes = 150000
-eta = 0.5
-epsilon = 0.5
+max_episodes = 100000
+eta = 0.9
+epsilon = 0.9
 _, optimal_value = value_iteration(env_big, gamma, theta, max_iterations)
 theta = 0.1
 print('')
@@ -152,11 +157,13 @@ print('')
 print('## Sarsa')
 policy, value = experiment_sarsa(env_big, max_episodes, eta, gamma, epsilon, optimal_value,theta,seed=seed)
 env_big.render(policy, value)
-
+print("Optimal value")
+print(optimal_value[0:optimal_value.shape[0]-1].reshape(8,8))
 print('')
 
 print('## Q-learning')
 policy, value = experiment_q_learning(env_big, max_episodes, eta, gamma, epsilon,optimal_value ,theta,seed=seed)
 env_big.render(policy, value)
-
+print("Optimal value")
+print(optimal_value[0:optimal_value.shape[0]-1].reshape(8,8))
 print('')
