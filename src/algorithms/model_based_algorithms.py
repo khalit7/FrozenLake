@@ -1,5 +1,5 @@
 import numpy as np
-
+import timeit
 ################ Model-based algorithms ################
 
 def policy_evaluation(env, policy, gamma, theta, max_iterations):
@@ -46,14 +46,26 @@ def policy_iteration(env, gamma, theta, max_iterations, policy=None):
     else:
         policy = np.array(policy, dtype=int)
     
+    prev_policy = np.zeros(env.n_states, dtype=int) # keep track of previous policy, to know when there is no improvement and hence terminate the policy
+
     current_iteration = 0
 
-    while current_iteration < max_iterations :
+    start = timeit.default_timer() # to time the algorithms
+
+    while current_iteration < max_iterations:
         value = policy_evaluation(env, policy, gamma, theta, max_iterations)
         policy = policy_improvement(env, value, gamma)
         current_iteration += 1
 
+        if np.all(np.equal(policy, prev_policy)): # if the previous policy is equal to the new improved policy, stop the algorithm.
+            break
+        else:
+            prev_policy = policy
+
+    end = timeit.default_timer()
+
     value = policy_evaluation(env, policy, gamma, theta, max_iterations)
+    print("**********************policy iteration took {} iterations to find the optimal policy. The algorithm ran in {} ms********************************".format(current_iteration,end-start))
     return policy, value
 
 
@@ -69,16 +81,18 @@ def value_iteration(env, gamma, theta, max_iterations, value=None):
     p = env.probs
     r = env.rewards
 
+    start = timeit.default_timer() # to time the algorithm
+
     while curr_iteration < max_iterations and not stop:
+        curr_iteration += 1
         delta = 0
         for s in range(env.n_states):
             current_value = value[s]
             value[s] = np.max(np.sum(p[:,s,:] * (r[:,s,:] + (gamma * value.reshape(-1, 1))), axis=0))
             delta = max(delta, abs(current_value - value[s]))
 
-        curr_iteration += 1
         stop = delta < theta
-
+    end = timeit.default_timer()
     policy = policy_improvement(env, value, gamma)
-
+    print("**********************value iteration took {} iterations to find the optimal policy. The algorithms ran in {} ms********************************".format(curr_iteration,end-start))
     return policy, value
