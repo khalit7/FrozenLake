@@ -1,4 +1,4 @@
-from frozen_lake_enviroment import *
+import numpy as np
 
 ################ Non-tabular model-free algorithms ################
 

@@ -6,7 +6,7 @@
 # Note that the learning rate and exploration factor decrease linearly as the number 
 # of episodes increases (for instance, eta[i] contains the learning rate for episode i).
 import numpy as np
-from epsilon_greedy_algorithm import epsilon_greedy
+from helper.epsilon_greedy_algorithm import epsilon_greedy
 
 
 def sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):

@@ -1,4 +1,4 @@
-from enviroment_setup import *
+from enviroment.enviroment_setup import *
 import contextlib
 
 # Configures numpy print options

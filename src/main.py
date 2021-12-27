@@ -1,7 +1,8 @@
-from frozen_lake_enviroment import *
-from model_based_algorithms import *
-from tabular_model_free_algorithms import *
-from non_tabular_model_free_algorithms import *
+from enviroment.frozen_lake_enviroment import FrozenLake
+
+from algorithms.model_based_algorithms import *
+from algorithms.tabular_model_free_algorithms import *
+from algorithms.non_tabular_model_free_algorithms import *
 ################ Main function ################
 def main():
     seed = 0
@@ -9,7 +10,7 @@ def main():
     # Small lake
     lake =   [['&', '.', '.', '.'],
               ['.', '#', '.', '#'],
-              ['.', '.', '.', '#'],
+              ['.', '.', '.', '#'], 
               ['#', '.', '.', '$']]
 
     env = FrozenLake(lake, slip=0.1, max_steps=16, seed=seed)

@@ -1,4 +1,4 @@
-from frozen_lake_enviroment import *
+from enviroment.frozen_lake_enviroment import *
 
 def play(env):
     actions = ['w', 'a', 's', 'd']
