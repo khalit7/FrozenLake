@@ -1,5 +1,5 @@
 import numpy as np
-
+from helper.epsilon_greedy_algorithm import epsilon_greedy
 ################ Non-tabular model-free algorithms ################
 
 class LinearWrapper:
@@ -55,18 +55,11 @@ def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
         
         q = features.dot(theta)
 
-        # TODO:
-        #-- Finding the lineare greedy selection
-        actions = range(env.n_actions)
-
-        if random_state.rand() < epsilon[i]:
-            action = random_state.choice(actions)
-        else:
-            #-- finding the maximum argument randomly 
-            arg = np.argsort(q[actions])[::-1]
-            n_tied = sum(np.isclose(q[actions], q[actions][arg[0]]))
-            action = np.random.choice(arg[0:n_tied])
-            action =  actions[action]
+                
+        # get (select) the states for index i
+        epsilon_selection = epsilon_greedy(epsilon[i], random_state)
+        # select the action from random state using epsilon greedy
+        action = epsilon_selection.selection(q)
 
 
         done = False
@@ -74,16 +67,8 @@ def linear_sarsa(env, max_episodes, eta, gamma, epsilon, seed=None):
             next_features, r, done = env.step(action)
             delta = r - q[action]
             q = next_features.dot(theta)
-            actions = range(env.n_actions)
 
-            if random_state.rand() < epsilon[i]:
-                next_action = random_state.choice(actions)
-            else:
-                #-- finding the maximum argument randomly 
-                arg = np.argsort(q[actions])[::-1]
-                n_tied = sum(np.isclose(q[actions], q[actions][arg[0]]))
-                next_action = np.random.choice(arg[0:n_tied])
-                next_action =  actions[action]
+            next_action = epsilon_selection.selection(q)
             
             delta += gamma * q[next_action]
             theta += eta[i] * delta * features[action,:]
@@ -103,22 +88,15 @@ def linear_q_learning(env, max_episodes, eta, gamma, epsilon, seed=None):
     for i in range(max_episodes):
         features = env.reset()
         
-        # TODO:
+        # get (select) the states for index i
+        epsilon_selection = epsilon_greedy(epsilon[i], random_state)
+        
         q = features.dot(theta)
 
         done = False
         while not done:
-            #-- Finding the lineare greedy selection
-            actions = range(env.n_actions)
-
-            if random_state.rand() < epsilon[i]:
-                action = random_state.choice(actions)
-            else:
-                #-- finding the maximum argument randomly 
-                arg = np.argsort(q[actions])[::-1]
-                n_tied = sum(np.isclose(q[actions], q[actions][arg[0]]))
-                action = np.random.choice(arg[0:n_tied])
-                action =  actions[action]
+            # select the action from random state using epsilon greedy
+            action = epsilon_selection.selection(q)
                 
             
             next_features, r, done = env.step(action)
