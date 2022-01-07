@@ -47,6 +47,7 @@ Value:
 Question 5 : Try to find an optimal policy for the big frozen lake by tweaking the parameters for Sarsa control and Q-learning control (maximum number of episodes, learning rate, and exploration factor). You must use policy evaluation to confirm that the resulting policy is optimal.
 
 ## Sarsa
+******************************Sarsa converaged on episode 95842**********************
 Lake:
 [['&' '.' '.' '.' '.' '.' '.' '.']
  ['.' '.' '.' '.' '.' '.' '.' '.']
